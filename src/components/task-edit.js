@@ -1,5 +1,5 @@
 import {COLORS, DAYS, MONTH_NAMES} from "../const.js";
-import {formatTime} from "../utils.js";
+import {createElement, formatTime} from "../utils.js";
 
 const createColorsMarkup = (colors, currentColor) => {
   return colors.map((color, index) => {
@@ -54,8 +54,7 @@ const getEditTaskTemplate = (task) => {
   const deadlineClass = isExpired ? `card--deadline` : ``
 
   return (
-      `
-      <article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
+      `<article class="card card--edit card--${color} ${repeatClass} ${deadlineClass}">
       <form class="card__form" method="get">
         <div class="card__inner">
           <div class="card__color-bar">
@@ -78,20 +77,20 @@ const getEditTaskTemplate = (task) => {
             <div class="card__details">
               <div class="card__dates">
                 <button class="card__date-deadline-toggle" type="button">
-                  date: <span class="card__date-status">yes</span>
+                  date: <span class="card__date-status">${isDateShowing ? `yes` : `no`}</span>
                 </button>
 
-                <fieldset class="card__date-deadline">
-                  <label class="card__input-deadline-wrap">
-                    <input
-                      class="card__date"
-                      type="text"
-                      placeholder=""
-                      name="date"
-                      value="${date} ${time}"
-                    />
-                  </label>
-                </fieldset>
+                ${isDateShowing ? `<fieldset class="card__date-deadline">
+                <label class="card__input-deadline-wrap">
+                  <input
+                    class="card__date"
+                    type="text"
+                    placeholder=""
+                    name="date"
+                    value="${date} ${time}"
+                  />
+                </label>
+              </fieldset>` : ``}
 
                 <button class="card__repeat-toggle" type="button">
                   repeat:<span class="card__repeat-status">${isRepeatingTask ? `yes` : `no`}</span>
@@ -100,8 +99,7 @@ const getEditTaskTemplate = (task) => {
                       <div class="card__repeat-days-inner">
                   ${repeatingDaysMarkup}
                     </div>
-                  </fieldset>` : ``
-                }
+                  </fieldset>` : `` }
               </div>
             </div>
             <div class="card__colors-inner">
@@ -117,10 +115,28 @@ const getEditTaskTemplate = (task) => {
           </div>
         </div>
       </form>
-    </article>
-  `
+    </article>`
   )
-  
 }
 
-export default getEditTaskTemplate;
+export default class TaskEdit {
+  constructor(task) {
+    this._task = task;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getEditTaskTemplate(this._task)
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate())
+    }
+    return this._element
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

@@ -1,16 +1,22 @@
+import {MONTH_NAMES} from "../const.js";
+import {createElement, formatTime} from "../utils.js";
+
 const getTaskTemplate = (task) => {
   const {color, description, dueData, repeatingDays, isArchive, isFavorite} = task;
 
-  const date = `23 September`
-  const time = `04:20`
+  const isExpired = dueData instanceof Date && dueData < Date.now();
+  const isDateShowing = !!dueData;
 
-  const repeatClass = `card--repeat`;
-  const deadlineClass = `card--deadline`
+  const date = isDateShowing ? `${dueData.getDate()} ${MONTH_NAMES[dueData.getMonth()]}` : ``;
+  const time = isDateShowing ? formatTime(dueData) : ``;
+
+  const repeatClass = Object.values(repeatingDays).some(Boolean) ? `card--repeat` : ``;
+  const deadlineClass = isExpired ? `card--deadline` : ``;
   const archiveButtonInactiveClass = isArchive ? `` : `card__btn--disabled`;
   const favoriteButtonInactiveClass = isFavorite ? `` : `card__btn--disabled`;
 
-  return `
-    <article class="card card--${color} ${repeatClass} ${deadlineClass}">
+  return (
+  `<article class="card card--${color} ${repeatClass} ${deadlineClass}">
       <div class="card__form">
         <div class="card__inner">
           <div class="card__control">
@@ -53,7 +59,28 @@ const getTaskTemplate = (task) => {
         </div>
       </div>
     </article>
-  `
+  `)
 }
 
-export default getTaskTemplate;
+export default class Task {
+  constructor(task) {
+    this._task = task;
+
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getTaskTemplate(this._task);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate())
+    }
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

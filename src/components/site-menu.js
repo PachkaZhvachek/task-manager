@@ -1,6 +1,8 @@
+import { createElement } from "../utils";
+
 const getMenuTemplate = () => {
-  return `
-    <section class="control__btn-wrap">
+  return (
+  `<section class="control__btn-wrap">
       <input
         type="radio"
         name="control"
@@ -27,7 +29,29 @@ const getMenuTemplate = () => {
       <label for="control__statistic" class="control__label"
         >STATISTICS</label
       >
-    </section> `
+    </section>`
+  );
 }
 
-export default getMenuTemplate;
+export default class SiteMenu {
+  constructor() {
+    this._element = null;
+  }
+
+  getTemplate() {
+    return getMenuTemplate()
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate())
+      console.log(this._element)
+    }
+    
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
